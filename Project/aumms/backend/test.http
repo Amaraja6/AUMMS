@@ -1,9 +1,18 @@
-POST http://localhost:4000/app/signup
+# @AUMMS-API-KEY = YUgdRi2PnxSl6wiLJXSIHsIgk7xcux9BhPPFxusqNlqUDsejdiwbTxMr0nfRIIfr
+# POST https://ap-south-1.aws.data.mongodb-api.com/app/gsheetstomongodb-gylry/endpoint/AUMMS_API
+# api-key:{{AUMMS-API-KEY}}
+
+
+# {
+#     "Email":"sar@gmail.com",
+#     "Knowledge1": "dawdawd"
+# }
+#   "Password":"dadaw"
+
+POST  http://localhost:4000/app/login
 Content-Type: application/json
 
-{
-    "FirstName":"Aaditya",
-    "LastName":"Prabu",
-    "Email":"aadityaprabu@gmail.com",
-    "Password":"Aadi@123"
-}
+ {
+     "Email":"aadityaprabu@gmail.com",
+     "Password":"1263"
+ }
