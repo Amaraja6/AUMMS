@@ -1,41 +1,95 @@
 import React, { useState } from "react";
-import data from "./data";
-function SearchBar() {
-  const [keyword, searchKeyword] = useState("");
-  const searchText = (event) => {
-    searchKeyword(event.target.value);
-  };
-  let dataSearch = data.cardData.filter((item) => {
-    return Object.keys(item).some((key) =>
-      item[key]
-        .toString()
-        .toLowerCase()
-        .includes(keyword.toString().toLocaleLowerCase())
-    );
-  });
+
+import axios from "axios";
+import validator from "validator";
+function SearchBar({ setAuthorize }) {
+  let [Keyword, changeKeyword] = useState("");
+  let [Mentors, setMentors] = useState([]);
+  // const navigate = useNavigate();
+
+  function onSubmit(event) {
+    event.preventDefault();
+    if (validator.isEmpty(Keyword)) {
+      let res = document.getElementById("response");
+      res.innerText = "No result found!";
+      setMentors([]);
+      return;
+    }
+    let Domain = document.getElementById("Domain");
+    Domain = Domain.options[Domain.selectedIndex].text;
+    const NewSearch = {
+      Keyword: Keyword,
+      Domain: Domain,
+    };
+
+    axios
+      .post("http://localhost:4000/app/search", NewSearch)
+      .then((response) => {
+        if (response.data.length === 0) {
+          let res = document.getElementById("response");
+          res.innerText = "No result found!";
+        } else {
+          let res = document.getElementById("response");
+          res.innerText = "";
+        }
+        const content = response.data;
+        setMentors([...content]);
+      });
+  }
+
   return (
     <section className="py-4 container">
       <div className="row justify-content-center">
-        <div className="col-12 mb-5">
-          <div className="mb-3 col-4 mx-auto text-center">
-            <label className="form-label h4">Search</label>
+        <form onSubmit={(event) => onSubmit(event)} className="form-inline">
+          <div class="form-group mx-sm-3 mb-2">
+            <label htmlFor="keyword" className="sr-only">
+              Enter a keyword
+            </label>
             <input
-              className="form-control"
+              value={Keyword}
+              onChange={(event) => {
+                changeKeyword(event.target.value);
+              }}
               type="text"
-              value={keyword}
-              onChange={searchText.bind(this)}
+              className="form-control"
+              id="keyword"
+              placeholder="keyword"
             />
           </div>
-        </div>
-
-        {dataSearch.map((item, index) => {
+          <label htmlFor="Domain">Search based on </label>
+          <select name="Domain" id="Domain">
+            <option value="Knowledge">Knowledge</option>
+            <option value="Department">Department</option>
+          </select>
+          <input
+            type="submit"
+            value="Search"
+            className="btn btn-primary mb-2"
+          />
+        </form>
+        <div id="response" style={{ color: "grey" }}></div>
+        {Mentors.map((item, index) => {
           return (
             <div key={index} className="col-5 col-md-4 col-lg-3 mx-0 mb-4">
               <div className="card p-0 overflow-hidden h-100 shadow">
                 <div className="card-body">
-                  <h5 className="card-title">{item.name}</h5>
-                  <h4 className="card-title">{item.dept}</h4>
-                  <p className="card-text">{item.subjects}</p>
+                  <p className="card-title">
+                    {item.FirstName + " " + item.LastName}
+                  </p>
+                  <p className="card-title">{item.Degree}</p>
+                  <p className="card-text">{item.Email}</p>
+                  <p className="card-text">{item.Department}</p>
+                  <p className="card-text">
+                    {
+                      new Date(item.GraduationYear)
+                        .toLocaleString()
+                        .split(",")[0]
+                    }
+                  </p>
+                  <p className="card-text">{item.Knowledge1}</p>
+                  <p className="card-text">{item.Knowledge2}</p>
+                  <p className="card-text">{item.Knowledge3}</p>
+                  <p className="card-text">{item.Knowledge4}</p>
                 </div>
               </div>
             </div>

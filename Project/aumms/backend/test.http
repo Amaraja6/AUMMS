@@ -9,10 +9,13 @@
 # }
 #   "Password":"dadaw"
 
-POST  http://localhost:4000/app/login
-Content-Type: application/json
 
- {
-     "Email":"aadityaprabu@gmail.com",
-     "Password":"1263"
- }
+GET http://localhost:4000/app/authorize
+x-access-token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI2MzI3MTQ4ODQyYzMyMjA3M2MxODNhYTYiLCJpYXQiOjE2NjM1MjY3NjYsImV4cCI6MTY2MzUyNzA2Nn0.r2St1acdPX8s24OAPQVwm0JaX3sqs_9lIJZOAbIs35g
+# POST  http://localhost:4000/app/login
+# Content-Type: application/json
+
+# {
+#      "Email":"aadityaprabu@gmail.com",
+#      "Password":"Aaditya@123"
+# }

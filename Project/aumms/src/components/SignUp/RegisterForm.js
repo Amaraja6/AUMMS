@@ -1,124 +1,139 @@
-import React, { Component } from "react";
-//import "./RegisterForm.css";
-
+import React, { useState } from "react";
+import "./RegisterForm.css";
 import axios from "axios";
-//import center from "../PAGES/center";
-
-class RegisterForm extends Component {
-  constructor() {
-    super();
-    this.state = {
-      FirstName: "",
-      LastName: "",
-      Email: "",
-      Password: "",
-      RePassword: "",
-    };
-
-    this.changeFirstName = this.changeFirstName.bind(this);
-    this.changeLastName = this.changeLastName.bind(this);
-    this.changeEmail = this.changeEmail.bind(this);
-    this.changePassword = this.changePassword.bind(this);
-    this.changeRePassword = this.changeRePassword.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
-  }
-  changeFirstName(event) {
-    this.setState({
-      FirstName: event.target.value,
-    });
-  }
-  changeLastName(event) {
-    this.setState({
-      LastName: event.target.value,
-    });
-  }
-  changePassword(event) {
-    this.setState({
-      Password: event.target.value,
-    });
-  }
-  changeEmail(event) {
-    this.setState({
-      Email: event.target.value,
-    });
-  }
-  changeRePassword(event) {
-    this.setState({
-      RePassword: event.target.value,
-    });
-  }
-  onSubmit(event) {
+import { useNavigate } from "react-router-dom";
+import validator from "validator";
+const sleep = (ms) => {
+  return new Promise(function (resolve, reject) {
+    setTimeout(alert("Redirecting to login page in 5 secs"), ms);
+  });
+};
+function RegisterForm() {
+  let [FirstName, changeFirstName] = useState("");
+  let [LastName, changeLastName] = useState("");
+  let [Email, changeEmail] = useState("");
+  let [Password, changePassword] = useState("");
+  let [RePassword, changeRePassword] = useState("");
+  const navigate = useNavigate();
+  function onSubmit(event) {
     event.preventDefault();
-    const registered = {
-      FirstName: this.state.FirstName,
-      LastName: this.state.LastName,
-      Email: this.state.Email,
-      Password: this.state.Password,
+    const NewUser = {
+      FirstName: FirstName,
+      LastName: LastName,
+      Email: Email,
+      Password: Password,
+      RetypePassword: RePassword,
     };
 
-    axios
-      .post("http://localhost:4000/app/signup", registered)
-      .then((response) => {
-        console.log(response.data);
-      });
-    this.setState = {
-      FirstName: "",
-      LastName: "",
-      Email: "",
-      Password: "",
-      RePassword: "",
-    };
+    let valid = [
+      validator.isEmail(NewUser.Email),
+      validator.isLength(NewUser.FirstName, { min: 2, max: 50 }),
+      validator.isLength(NewUser.LastName, { min: 2, max: 50 }),
+      validator.isStrongPassword(NewUser.Password, {
+        minLength: 8,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1,
+      }),
+      validator.equals(NewUser.Password, NewUser.RetypePassword),
+    ];
+    console.log(valid.indexOf(false));
+    if (valid.indexOf(false) !== -1) {
+      let res = document.getElementById("response");
+      res.innerText = "Error, failed to register user!";
+      res.style.color = "red";
+      return;
+    }
+
+    axios.post("http://localhost:4000/app/signup", NewUser).then((response) => {
+      let res = document.getElementById("response");
+
+      if (response.data["status"] === -1) {
+        res.innerText = response.data["error"];
+        res.style.color = "red";
+      } else if (response.data["status"] === 0) {
+        res.innerText = response.data["message"];
+        res.style.color = "grey";
+      } else {
+        res.innerText = response.data["message"];
+        res.style.color = "green";
+        sleep(5000).then(navigate("/login"));
+      }
+    });
   }
-  render() {
-    return (
-      <div className="container">
-        <div className="row col-12   ">
-          <h2 className="text-center">Sign Up</h2>
-          <form onSubmit={this.onSubmit} className=" form-goup col-md-12 ">
-            <label>First Name:</label>
+
+  return (
+    <div className="container">
+      <div className="row col-12   ">
+        <h2 className="text-center">Sign Up</h2>
+        <form
+          onSubmit={(event) => onSubmit(event)}
+          className=" form-goup col-md-12 "
+        >
+          <label>First Name:</label>
+          <input
+            type="text"
+            onChange={(event) => {
+              changeFirstName(event.target.value);
+            }}
+            value={FirstName}
+            placeholder="First Name"
+            className="form-control "
+          />
+          <label>Last Name:</label>
+          <input
+            type="text"
+            onChange={(event) => {
+              changeLastName(event.target.value);
+            }}
+            value={LastName}
+            placeholder="Last Name"
+            className="form-control "
+          />
+          <label>Email:</label>
+          <input
+            type="text"
+            onChange={(event) => {
+              changeEmail(event.target.value);
+            }}
+            value={Email}
+            placeholder="Email"
+            className="form-control"
+          />
+          <label>Password:</label>
+          <input
+            type="password"
+            onChange={(event) => {
+              changePassword(event.target.value);
+            }}
+            value={Password}
+            placeholder="Password"
+            className="form-control"
+          />
+          <label>Re type Password:</label>
+          <input
+            type="password"
+            onChange={(event) => {
+              changeRePassword(event.target.value);
+            }}
+            value={RePassword}
+            placeholder="Retype Password"
+            className="form-control"
+          />
+          <br></br>
+          <div className="col-md-12 text-center">
             <input
-              type="text"
-              onChange={this.changeFirstName}
-              value={this.state.FirstName}
-              placeholder="First Name"
-              className="form-control "
+              type="submit"
+              value="submit"
+              className="btn btn-primary btn-block"
             />
-            <label>Last Name:</label>
-            <input
-              type="text"
-              onChange={this.changeLastName}
-              value={this.state.LastName}
-              placeholder="Last Name"
-              className="form-control "
-            />
-            <label>Email:</label>
-            <input
-              type="text"
-              onChange={this.changeEmail}
-              value={this.state.Email}
-              placeholder="Email"
-              className="form-control"
-            />
-            <label>Password:</label>
-            <input
-              type="password"
-              onChange={this.changePassword}
-              value={this.state.Password}
-              placeholder="Password"
-              className="form-control"
-            />
-            <br></br>
-            <div className="col-md-12 text-center">
-              <input
-                type="submit"
-                value="submit"
-                className="btn btn-primary btn-block"
-              />
-            </div>
-          </form>
-        </div>
+          </div>
+
+          <div style={{ textAlign: "center" }} id="response"></div>
+        </form>
       </div>
-    );
-  }
+    </div>
+  );
 }
 export default RegisterForm;
